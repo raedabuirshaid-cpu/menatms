@@ -1,0 +1,647 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "مدير النظام",
+      "email": "admin@center.sa",
+      "password": "$2b$10$.734Xpau96t86tUo3MEiTOh6jongIxK764hYE36bmT9KaiTYbJF9O",
+      "role": "admin",
+      "active": true,
+      "createdAt": "2026-04-01"
+    },
+    {
+      "id": "2",
+      "name": "مدير المركز",
+      "email": "manager@center.sa",
+      "password": "$2b$10$.734Xpau96t86tUo3MEiTOh6jongIxK764hYE36bmT9KaiTYbJF9O",
+      "role": "manager",
+      "active": true,
+      "createdAt": "2026-04-01"
+    },
+    {
+      "id": "3",
+      "name": "مدخل البيانات",
+      "email": "dataentry@center.sa",
+      "password": "$2b$10$.734Xpau96t86tUo3MEiTOh6jongIxK764hYE36bmT9KaiTYbJF9O",
+      "role": "dataentry",
+      "active": true,
+      "createdAt": "2026-04-01"
+    },
+    {
+      "id": "4",
+      "name": "أحمد المعلم",
+      "email": "teacher@center.sa",
+      "password": "$2b$10$.734Xpau96t86tUo3MEiTOh6jongIxK764hYE36bmT9KaiTYbJF9O",
+      "role": "teacher",
+      "active": true,
+      "createdAt": "2026-04-01"
+    },
+    {
+      "id": "5",
+      "name": "سارة المتدربة",
+      "email": "trainee@center.sa",
+      "password": "$2b$10$.734Xpau96t86tUo3MEiTOh6jongIxK764hYE36bmT9KaiTYbJF9O",
+      "role": "trainee",
+      "active": true,
+      "createdAt": "2026-04-01"
+    }
+  ],
+  "programs": [
+    {
+      "id": "1",
+      "name": "دبلوم إدارة الأعمال",
+      "type": "دبلوم متوسط",
+      "classification": "عام",
+      "deliveryMode": "حضوري",
+      "clientName": "",
+      "status": "نشط",
+      "createdAt": "2026-04-01"
+    },
+    {
+      "id": "2",
+      "name": "برنامج تطوير القيادات",
+      "type": "برنامج تأهيلي",
+      "classification": "مشروع",
+      "deliveryMode": "مدمج",
+      "clientName": "وزارة الموارد البشرية",
+      "status": "نشط",
+      "createdAt": "2026-04-01"
+    },
+    {
+      "id": "3",
+      "name": "دبلوم تقنية المعلومات",
+      "type": "دبلوم متوسط",
+      "classification": "عام",
+      "deliveryMode": "عن بعد",
+      "clientName": "",
+      "status": "نشط",
+      "createdAt": "2026-04-01"
+    },
+    {
+      "id": "74eb96c6-1ae1-4014-a400-0926793f38ef",
+      "name": "برنامج اختبار",
+      "type": "دورة تطويرية",
+      "classification": "عام",
+      "deliveryMode": "حضوري",
+      "clientName": "",
+      "status": "نشط",
+      "createdAt": "2026-04-29"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "1",
+      "courseCode": "BUS101",
+      "name": "مبادئ الإدارة",
+      "programId": "1",
+      "semester": 1,
+      "part": 1,
+      "creditHours": 3,
+      "weeklyHours": 3,
+      "lectureHours": 2,
+      "practicalHours": 1,
+      "tutorialHours": 0,
+      "prerequisite": ""
+    },
+    {
+      "id": "2",
+      "courseCode": "BUS102",
+      "name": "الموارد البشرية",
+      "programId": "1",
+      "semester": 1,
+      "part": 1,
+      "creditHours": 3,
+      "weeklyHours": 3,
+      "lectureHours": 2,
+      "practicalHours": 0,
+      "tutorialHours": 1,
+      "prerequisite": ""
+    },
+    {
+      "id": "3",
+      "courseCode": "BUS201",
+      "name": "إدارة المشاريع",
+      "programId": "1",
+      "semester": 2,
+      "part": 1,
+      "creditHours": 3,
+      "weeklyHours": 3,
+      "lectureHours": 2,
+      "practicalHours": 1,
+      "tutorialHours": 0,
+      "prerequisite": "BUS101"
+    },
+    {
+      "id": "4",
+      "courseCode": "IT101",
+      "name": "أساسيات الحوسبة",
+      "programId": "3",
+      "semester": 1,
+      "part": 1,
+      "creditHours": 3,
+      "weeklyHours": 4,
+      "lectureHours": 2,
+      "practicalHours": 2,
+      "tutorialHours": 0,
+      "prerequisite": ""
+    },
+    {
+      "id": "5",
+      "courseCode": "IT102",
+      "name": "قواعد البيانات",
+      "programId": "3",
+      "semester": 1,
+      "part": 2,
+      "creditHours": 3,
+      "weeklyHours": 4,
+      "lectureHours": 2,
+      "practicalHours": 2,
+      "tutorialHours": 0,
+      "prerequisite": "IT101"
+    }
+  ],
+  "teachers": [
+    {
+      "id": "1",
+      "userId": "4",
+      "name": "أحمد المعلم",
+      "email": "teacher@center.sa",
+      "phone": "0501234567",
+      "idNumber": "1234567890",
+      "jobTitle": "محاضر",
+      "employmentType": "دوام كامل",
+      "approvalStatus": "معتمد",
+      "available": true,
+      "maxLoad": 16,
+      "subjectIds": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "id": "2",
+      "name": "فاطمة الزهراء",
+      "email": "fatima@center.sa",
+      "phone": "0507654321",
+      "idNumber": "1098765432",
+      "jobTitle": "محاضرة",
+      "employmentType": "متعاون",
+      "approvalStatus": "معتمد",
+      "available": true,
+      "maxLoad": 14,
+      "subjectIds": [
+        "3"
+      ]
+    },
+    {
+      "id": "3",
+      "name": "محمد العتيبي",
+      "email": "mohammed@center.sa",
+      "phone": "0509876543",
+      "idNumber": "1122334455",
+      "jobTitle": "مدرب",
+      "employmentType": "دوام كامل",
+      "approvalStatus": "تحت الاعتماد",
+      "available": false,
+      "maxLoad": 16,
+      "subjectIds": [
+        "4",
+        "5"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "1",
+      "number": "A1",
+      "programId": "1",
+      "semester": 1,
+      "part": 1,
+      "traineeCount": 0,
+      "createdAt": "2026-04-01"
+    },
+    {
+      "id": "2",
+      "number": "A2",
+      "programId": "1",
+      "semester": 1,
+      "part": 1,
+      "traineeCount": 0,
+      "createdAt": "2026-04-01"
+    },
+    {
+      "id": "3",
+      "number": "B1",
+      "programId": "3",
+      "semester": 1,
+      "part": 1,
+      "traineeCount": 0,
+      "createdAt": "2026-04-01"
+    }
+  ],
+  "trainees": [
+    {
+      "id": "1",
+      "userId": "5",
+      "name": "سارة المتدربة",
+      "email": "trainee@center.sa",
+      "phone": "0551234567",
+      "idNumber": "2345678901",
+      "sectionId": "1",
+      "semester": 1,
+      "part": 1,
+      "status": "نشط",
+      "enrollmentDate": "2026-04-01"
+    },
+    {
+      "id": "2",
+      "name": "خالد العمري",
+      "email": "khalid@center.sa",
+      "phone": "0552345678",
+      "idNumber": "2456789012",
+      "sectionId": "1",
+      "semester": 1,
+      "part": 1,
+      "status": "نشط",
+      "enrollmentDate": "2026-04-01"
+    },
+    {
+      "id": "3",
+      "name": "نورة السبيعي",
+      "email": "noura@center.sa",
+      "phone": "0553456789",
+      "idNumber": "2567890123",
+      "sectionId": "2",
+      "semester": 1,
+      "part": 1,
+      "status": "نشط",
+      "enrollmentDate": "2026-04-01"
+    }
+  ],
+  "calendarEvents": [
+    {
+      "id": "1",
+      "name": "بداية الفصل الدراسي الأول",
+      "date": "2026-09-01",
+      "type": "أكاديمي",
+      "semester": 1,
+      "alertDays": [
+        14,
+        7,
+        1
+      ]
+    },
+    {
+      "id": "2",
+      "name": "اختبارات منتصف الفصل",
+      "date": "2026-10-15",
+      "type": "اختبار",
+      "semester": 1,
+      "alertDays": [
+        14,
+        7,
+        1
+      ]
+    },
+    {
+      "id": "3",
+      "name": "إجازة اليوم الوطني",
+      "date": "2026-09-23",
+      "type": "إجازة",
+      "semester": 1,
+      "alertDays": [
+        7,
+        1
+      ]
+    }
+  ],
+  "scheduleRules": [
+    {
+      "id": 1,
+      "name": "عدد حصص المادة",
+      "description": "لكل شعبة عدد حصص محدد لكل مادة",
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "name": "الإجمالي الأسبوعي",
+      "description": "كل شعبة لها 10 حصص أسبوعياً بالضبط",
+      "enabled": true
+    },
+    {
+      "id": 3,
+      "name": "عدم تكرار المادة في اليوم",
+      "description": "لا تُدرَّس نفس المادة أكثر من مرة في اليوم",
+      "enabled": true
+    },
+    {
+      "id": 4,
+      "name": "صفر تعارضات للمعلم",
+      "description": "لا يُدرِّس معلم شعبتين في نفس الفترة",
+      "enabled": true
+    },
+    {
+      "id": 5,
+      "name": "صفر تعارضات للشعبة",
+      "description": "لا تدرس شعبة مادتين في نفس الفترة",
+      "enabled": true
+    },
+    {
+      "id": 6,
+      "name": "ثبات معلم الشعبة",
+      "description": "معلم واحد ثابت لكل مادة طوال الأسبوع",
+      "enabled": true
+    },
+    {
+      "id": 7,
+      "name": "نصاب المعلم لا يُتجاوز",
+      "description": "موارد بشرية=16 حصة، باقي المواد=14 حصة",
+      "enabled": true
+    },
+    {
+      "id": 8,
+      "name": "حد أقصى 4 حصص يومياً للمعلم",
+      "description": "لا يزيد عدد حصص المعلم في اليوم عن 4",
+      "enabled": true
+    },
+    {
+      "id": 9,
+      "name": "حضور الشعبة جميع الأيام",
+      "description": "للشعبة حصص في الأحد حتى الخميس",
+      "enabled": true
+    },
+    {
+      "id": 10,
+      "name": "الحصص متتالية يومياً",
+      "description": "لا توجد فجوات بين حصص الشعبة في اليوم",
+      "enabled": true
+    },
+    {
+      "id": 11,
+      "name": "أيام عمل المعلم لا تتجاوز 5 أيام",
+      "description": "المعلم لا يُدرِّس أكثر من 5 أيام في الأسبوع",
+      "enabled": true
+    },
+    {
+      "id": 12,
+      "name": "ثبات شعب المعلم",
+      "description": "معلم مُخصَّص لمجموعة شعب ثابتة",
+      "enabled": true
+    },
+    {
+      "id": 13,
+      "name": "مدة الحصة 40 دقيقة",
+      "description": "كل حصة مدتها 40 دقيقة بالضبط",
+      "enabled": true
+    },
+    {
+      "id": 14,
+      "name": "البداية من 5:00 مساءً",
+      "description": "أول حصة تبدأ الساعة 5:00 مساءً",
+      "enabled": true
+    },
+    {
+      "id": 15,
+      "name": "توازن توزيع الفترات الأربع",
+      "description": "كل فترة تُستخدم 2-3 مرات أسبوعياً لكل شعبة",
+      "enabled": true
+    },
+    {
+      "id": 16,
+      "name": "تنوع الأنماط اليومية",
+      "description": "عدم تكرار نفس نمط الفترات يومياً",
+      "enabled": true
+    },
+    {
+      "id": 17,
+      "name": "قيود يوم الخميس",
+      "description": "المستجدون: حصة واحدة فقط تنتهي 6:20م كحد أقصى",
+      "enabled": true
+    },
+    {
+      "id": 18,
+      "name": "مطابقة تعيينات المعلمين",
+      "description": "كل معلم يُدرِّس المواد المُعينة له فقط",
+      "enabled": true
+    }
+  ],
+  "schedules": [],
+  "scheduleSlots": [
+    {
+      "id": "dc4caaf9-73bc-413e-b48e-af1fff6507c9",
+      "sectionId": "1",
+      "subjectId": "1",
+      "teacherId": "1",
+      "day": "الأحد",
+      "period": 1,
+      "weekNumber": 1,
+      "programId": "1",
+      "subjectName": "مبادئ الإدارة",
+      "teacherName": "أحمد المعلم",
+      "sectionNumber": "A1",
+      "periodInfo": {
+        "id": 1,
+        "start": "17:00",
+        "end": "17:40",
+        "label": "الفترة الأولى (5:00-5:40)"
+      }
+    },
+    {
+      "id": "db8b3b9e-402a-41b8-873d-a37742f17b51",
+      "sectionId": "1",
+      "subjectId": "1",
+      "teacherId": "1",
+      "day": "الاثنين",
+      "period": 1,
+      "weekNumber": 1,
+      "programId": "1",
+      "subjectName": "مبادئ الإدارة",
+      "teacherName": "أحمد المعلم",
+      "sectionNumber": "A1",
+      "periodInfo": {
+        "id": 1,
+        "start": "17:00",
+        "end": "17:40",
+        "label": "الفترة الأولى (5:00-5:40)"
+      }
+    },
+    {
+      "id": "502af6bf-8110-4654-a83c-4fb0ef9808b0",
+      "sectionId": "1",
+      "subjectId": "2",
+      "teacherId": "1",
+      "day": "الأحد",
+      "period": 2,
+      "weekNumber": 1,
+      "programId": "1",
+      "subjectName": "الموارد البشرية",
+      "teacherName": "أحمد المعلم",
+      "sectionNumber": "A1",
+      "periodInfo": {
+        "id": 2,
+        "start": "17:40",
+        "end": "18:20",
+        "label": "الفترة الثانية (5:40-6:20)"
+      }
+    },
+    {
+      "id": "b57fa5bf-f85a-49a8-a61d-e2f93f4c7716",
+      "sectionId": "1",
+      "subjectId": "2",
+      "teacherId": "1",
+      "day": "الاثنين",
+      "period": 2,
+      "weekNumber": 1,
+      "programId": "1",
+      "subjectName": "الموارد البشرية",
+      "teacherName": "أحمد المعلم",
+      "sectionNumber": "A1",
+      "periodInfo": {
+        "id": 2,
+        "start": "17:40",
+        "end": "18:20",
+        "label": "الفترة الثانية (5:40-6:20)"
+      }
+    },
+    {
+      "id": "e7aadd43-b967-4298-a0ac-efd140ac48f0",
+      "sectionId": "2",
+      "subjectId": "1",
+      "teacherId": "1",
+      "day": "الأحد",
+      "period": 3,
+      "weekNumber": 1,
+      "programId": "1",
+      "subjectName": "مبادئ الإدارة",
+      "teacherName": "أحمد المعلم",
+      "sectionNumber": "A2",
+      "periodInfo": {
+        "id": 3,
+        "start": "18:30",
+        "end": "19:10",
+        "label": "الفترة الثالثة (6:30-7:10)"
+      }
+    },
+    {
+      "id": "da585fb2-1bec-4197-b4c2-319cc1e1515c",
+      "sectionId": "2",
+      "subjectId": "1",
+      "teacherId": "1",
+      "day": "الاثنين",
+      "period": 3,
+      "weekNumber": 1,
+      "programId": "1",
+      "subjectName": "مبادئ الإدارة",
+      "teacherName": "أحمد المعلم",
+      "sectionNumber": "A2",
+      "periodInfo": {
+        "id": 3,
+        "start": "18:30",
+        "end": "19:10",
+        "label": "الفترة الثالثة (6:30-7:10)"
+      }
+    },
+    {
+      "id": "cd74b70f-1410-4640-a0ac-2b351ed927a4",
+      "sectionId": "2",
+      "subjectId": "2",
+      "teacherId": "1",
+      "day": "الأحد",
+      "period": 4,
+      "weekNumber": 1,
+      "programId": "1",
+      "subjectName": "الموارد البشرية",
+      "teacherName": "أحمد المعلم",
+      "sectionNumber": "A2",
+      "periodInfo": {
+        "id": 4,
+        "start": "19:10",
+        "end": "19:50",
+        "label": "الفترة الرابعة (7:10-7:50)"
+      }
+    },
+    {
+      "id": "cde22c95-3c21-44f2-ad78-35a5d3c5b35b",
+      "sectionId": "2",
+      "subjectId": "2",
+      "teacherId": "1",
+      "day": "الاثنين",
+      "period": 4,
+      "weekNumber": 1,
+      "programId": "1",
+      "subjectName": "الموارد البشرية",
+      "teacherName": "أحمد المعلم",
+      "sectionNumber": "A2",
+      "periodInfo": {
+        "id": 4,
+        "start": "19:10",
+        "end": "19:50",
+        "label": "الفترة الرابعة (7:10-7:50)"
+      }
+    }
+  ],
+  "attendance": [],
+  "grades": [],
+  "classSystems": [
+    {
+      "id": 1,
+      "name": "16 أسبوع",
+      "weeks": 16,
+      "deletable": false
+    },
+    {
+      "id": 2,
+      "name": "18 أسبوع",
+      "weeks": 18,
+      "deletable": false
+    },
+    {
+      "id": 3,
+      "name": "20 أسبوع",
+      "weeks": 20,
+      "deletable": false
+    },
+    {
+      "id": 4,
+      "name": "مكثف 8 أسابيع",
+      "weeks": 8,
+      "deletable": false
+    },
+    {
+      "id": 5,
+      "name": "مكثف 10 أسابيع",
+      "weeks": 10,
+      "deletable": false
+    },
+    {
+      "id": 6,
+      "name": "فصل دراسي عادي",
+      "weeks": 15,
+      "deletable": false
+    },
+    {
+      "id": 7,
+      "name": "فصل صيفي",
+      "weeks": 8,
+      "deletable": false
+    },
+    {
+      "id": 8,
+      "name": "ربع سنوي",
+      "weeks": 12,
+      "deletable": false
+    },
+    {
+      "id": 9,
+      "name": "سنوي",
+      "weeks": 36,
+      "deletable": false
+    },
+    {
+      "id": 10,
+      "name": "تدريب عملي",
+      "weeks": 6,
+      "deletable": false
+    }
+  ]
+}
