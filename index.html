@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام إدارة مركز التدريب — TMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+:root {
+  --c-bg:        #0d1117;
+  --c-surface:   #161b22;
+  --c-surface2:  #1c2330;
+  --c-border:    #21262d;
+  --c-border2:   #30363d;
+  --c-text:      #e6edf3;
+  --c-text2:     #8b949e;
+  --c-text3:     #484f58;
+  --c-accent:    #1f6feb;
+  --c-accent2:   #388bfd;
+  --c-green:     #238636;
+  --c-green2:    #2ea043;
+  --c-red:       #da3633;
+  --c-red2:      #f85149;
+  --c-yellow:    #9e6a03;
+  --c-yellow2:   #e3b341;
+  --c-purple:    #6e40c9;
+  --c-teal:      #1b7c83;
+  --font:        'IBM Plex Sans Arabic', sans-serif;
+  --mono:        'JetBrains Mono', monospace;
+  --radius:      8px;
+  --radius2:     12px;
+  --shadow:      0 1px 0 rgba(27,31,36,.04), 0 0 0 1px rgba(0,0,0,.2);
+  --shadow2:     0 8px 24px rgba(0,0,0,.4);
+  --sidebar-w:   240px;
+  --topbar-h:    56px;
+  --transition:  all .18s cubic-bezier(.4,0,.2,1);
+}
+
+/* ═══════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--c-bg);
+  color: var(--c-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+a { color: var(--c-accent2); text-decoration: none; }
+button { font-family: var(--font); cursor: pointer; }
+input, select, textarea { font-family: var(--font); direction: rtl; }
+table { border-collapse: collapse; width: 100%; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--c-surface); }
+::-webkit-scrollbar-thumb { background: var(--c-border2); border-radius: 3px; }
+
+/* ═══════════════════════════════════════
+   LOGIN PAGE
+═══════════════════════════════════════ */
+#login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--c-bg);
+  position: relative;
+  overflow: hidden;
+}
+#login-page::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(31,111,235,.12) 0%, transparent 70%);
+  top: -200px; right: -200px;
+  pointer-events: none;
+}
+#login-page::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(110,64,201,.08) 0%, transparent 70%);
+  bottom: -100px; left: -100px;
+  pointer-events: none;
+}
+.login-box {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius2);
+  padding: 48px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow2);
+  animation: slideUp .4s ease;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.login-logo .logo-icon {
+  width: 44px; height: 44px;
+  background: var(--c-accent);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.login-logo .logo-text h1 { font-size: 1.1rem; font-weight: 700; }
+.login-logo .logo-text p  { font-size: .78rem; color: var(--c-text2); }
+.login-box h2 { font-size: 1.3rem; font-weight: 600; margin-bottom: 6px; }
+.login-box .subtitle { color: var(--c-text2); font-size: .85rem; margin-bottom: 28px; }
+.login-error {
+  background: rgba(218,54,51,.1);
+  border: 1px solid rgba(218,54,51,.3);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  color: var(--c-red2);
+  font-size: .85rem;
+  margin-bottom: 16px;
+  display: none;
+}
+.login-error.show { display: block; animation: shake .3s ease; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+.quick-accounts {
+  background: var(--c-surface2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 20px;
+}
+.quick-accounts p { font-size: .78rem; color: var(--c-text2); margin-bottom: 8px; }
+.quick-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.quick-btn {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border2);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: .75rem;
+  color: var(--c-text);
+  transition: var(--transition);
+}
+.quick-btn:hover { border-color: var(--c-accent); color: var(--c-accent2); }
+
+/* ═══════════════════════════════════════
+   FORM ELEMENTS
+═══════════════════════════════════════ */
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: .83rem; font-weight: 500; color: var(--c-text2); margin-bottom: 6px; }
+.field-input {
+  width: 100%;
+  background: var(--c-surface2);
+  border: 1px solid var(--c-border2);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  color: var(--c-text);
+  font-size: .9rem;
+  transition: var(--transition);
+  outline: none;
+}
+.field-input:focus { border-color: var(--c-accent); box-shadow: 0 0 0 3px rgba(31,111,235,.15); }
+.field-input::placeholder { color: var(--c-text3); }
+select.field-input { cursor: pointer; }
+
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: none; border-radius: var(--radius);
+  padding: 8px 16px; font-size: .85rem; font-weight: 500;
+  transition: var(--transition); cursor: pointer;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--c-accent); color: #fff; }
+.btn-primary:hover { background: var(--c-accent2); }
+.btn-success { background: var(--c-green); color: #fff; }
+.btn-success:hover { background: var(--c-green2); }
+.btn-danger  { background: rgba(218,54,51,.15); color: var(--c-red2); border: 1px solid rgba(218,54,51,.3); }
+.btn-danger:hover  { background: rgba(218,54,51,.25); }
+.btn-ghost   { background: transparent; color: var(--c-text2); border: 1px solid var(--c-border2); }
+.btn-ghost:hover { background: var(--c-surface2); color: var(--c-text); border-color: var(--c-border2); }
+.btn-icon    { padding: 6px; border-radius: 6px; }
+.btn-full    { width: 100%; justify-content: center; padding: 11px; font-size: .95rem; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════ */
+#app { display: none; min-height: 100vh; }
+#app.visible { display: flex; }
+
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--c-surface);
+  border-left: 1px solid var(--c-border);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; right: 0; bottom: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--c-border);
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.sidebar-logo {
+  width: 32px; height: 32px;
+  background: var(--c-accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.sidebar-brand h2 { font-size: .88rem; font-weight: 700; }
+.sidebar-brand p  { font-size: .72rem; color: var(--c-text2); }
+
+.sidebar-nav { padding: 8px; flex: 1; }
+.nav-section { margin-bottom: 4px; }
+.nav-section-title {
+  font-size: .68rem; font-weight: 600;
+  color: var(--c-text3); letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 12px 8px 4px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 6px;
+  font-size: .85rem; color: var(--c-text2);
+  cursor: pointer; transition: var(--transition);
+  user-select: none;
+  border: none; background: none; width: 100%; text-align: right;
+}
+.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-item:hover { background: var(--c-surface2); color: var(--c-text); }
+.nav-item.active { background: rgba(31,111,235,.15); color: var(--c-accent2); font-weight: 500; }
+.nav-item.active .nav-icon { filter: none; }
+
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid var(--c-border);
+  flex-shrink: 0;
+}
+.user-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  background: var(--c-surface2);
+  cursor: pointer; transition: var(--transition);
+}
+.user-card:hover { background: var(--c-border); }
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .85rem; flex-shrink: 0;
+}
+.user-info .user-name { font-size: .83rem; font-weight: 600; }
+.user-info .user-role { font-size: .72rem; color: var(--c-text2); }
+.logout-btn {
+  margin-top: 6px;
+  width: 100%;
+  background: none; border: 1px solid var(--c-border2);
+  border-radius: 6px; padding: 7px;
+  color: var(--c-text2); font-size: .8rem;
+  cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.logout-btn:hover { background: rgba(218,54,51,.1); color: var(--c-red2); border-color: rgba(218,54,51,.3); }
+
+/* ═══════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════ */
+.main-area {
+  margin-right: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+}
+.topbar {
+  height: var(--topbar-h);
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-title { font-size: 1rem; font-weight: 600; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.page-content { padding: 24px; flex: 1; max-width: 1400px; }
+
+/* ═══════════════════════════════════════
+   DASHBOARD CARDS
+═══════════════════════════════════════ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius2);
+  padding: 20px;
+  transition: var(--transition);
+  position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 4px; height: 100%;
+}
+.stat-card.blue::before   { background: var(--c-accent); }
+.stat-card.green::before  { background: var(--c-green2); }
+.stat-card.purple::before { background: var(--c-purple); }
+.stat-card.teal::before   { background: var(--c-teal); }
+.stat-card.yellow::before { background: var(--c-yellow2); }
+.stat-card:hover { border-color: var(--c-border2); transform: translateY(-2px); box-shadow: var(--shadow2); }
+.stat-icon { font-size: 28px; margin-bottom: 12px; }
+.stat-value { font-size: 2rem; font-weight: 700; font-family: var(--mono); line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: .8rem; color: var(--c-text2); }
+
+/* ═══════════════════════════════════════
+   TABLES
+═══════════════════════════════════════ */
+.table-container {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius2);
+  overflow: hidden;
+}
+.table-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--c-border);
+  gap: 12px; flex-wrap: wrap;
+}
+.table-header h3 { font-size: .95rem; font-weight: 600; }
+.table-header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.search-input {
+  background: var(--c-surface2);
+  border: 1px solid var(--c-border2);
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  color: var(--c-text);
+  font-size: .85rem;
+  width: 220px;
+  outline: none;
+  transition: var(--transition);
+  direction: rtl;
+}
+.search-input:focus { border-color: var(--c-accent); }
+
+.tbl { width: 100%; }
+.tbl thead th {
+  background: var(--c-surface2);
+  padding: 10px 16px;
+  text-align: right;
+  font-size: .78rem; font-weight: 600;
+  color: var(--c-text2); letter-spacing: .03em;
+  border-bottom: 1px solid var(--c-border);
+  white-space: nowrap;
+}
+.tbl tbody tr {
+  border-bottom: 1px solid var(--c-border);
+  transition: background .12s;
+}
+.tbl tbody tr:last-child { border-bottom: none; }
+.tbl tbody tr:hover { background: var(--c-surface2); }
+.tbl tbody td {
+  padding: 11px 16px;
+  font-size: .85rem;
+  vertical-align: middle;
+}
+.tbl .actions { display: flex; gap: 6px; justify-content: flex-end; }
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--c-text3);
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: .9rem; }
+
+/* ═══════════════════════════════════════
+   BADGES
+═══════════════════════════════════════ */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: .75rem; font-weight: 500;
+}
+.badge-blue   { background: rgba(31,111,235,.15); color: var(--c-accent2); }
+.badge-green  { background: rgba(46,160,67,.15);  color: var(--c-green2); }
+.badge-red    { background: rgba(248,81,73,.15);  color: var(--c-red2); }
+.badge-yellow { background: rgba(227,179,65,.15); color: var(--c-yellow2); }
+.badge-purple { background: rgba(110,64,201,.15); color: #a371f7; }
+.badge-gray   { background: var(--c-surface2); color: var(--c-text2); }
+
+/* ═══════════════════════════════════════
+   MODAL
+═══════════════════════════════════════ */
+.modal-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center; justify-content: center;
+}
+.modal-backdrop.open { display: flex; animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border2);
+  border-radius: var(--radius2);
+  width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: var(--shadow2);
+  animation: modalIn .25s cubic-bezier(.34,1.3,.7,1);
+  position: relative;
+}
+.modal-lg { max-width: 720px; }
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(.92) translateY(-10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--c-border);
+}
+.modal-header h3 { font-size: 1rem; font-weight: 600; }
+.modal-close {
+  background: none; border: none; color: var(--c-text2);
+  font-size: 20px; cursor: pointer; padding: 4px;
+  border-radius: 6px; transition: var(--transition);
+  display: flex;
+}
+.modal-close:hover { background: var(--c-surface2); color: var(--c-text); }
+.modal-body { padding: 24px; }
+.modal-footer {
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding: 16px 24px;
+  border-top: 1px solid var(--c-border);
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid .full { grid-column: 1 / -1; }
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+#toast-container {
+  position: fixed; top: 16px; left: 16px;
+  z-index: 9999;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border2);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  font-size: .85rem;
+  box-shadow: var(--shadow2);
+  display: flex; align-items: center; gap: 10px;
+  animation: toastIn .25s ease;
+  min-width: 260px;
+}
+.toast-success { border-right: 3px solid var(--c-green2); }
+.toast-error   { border-right: 3px solid var(--c-red2); }
+.toast-info    { border-right: 3px solid var(--c-accent2); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ═══════════════════════════════════════
+   SCHEDULE GRID
+═══════════════════════════════════════ */
+.schedule-grid-wrap { overflow-x: auto; }
+.schedule-grid {
+  min-width: 700px;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius2);
+  overflow: hidden;
+}
+.schedule-grid table { width: 100%; }
+.schedule-grid th {
+  background: var(--c-surface2);
+  padding: 10px 14px;
+  font-size: .8rem; font-weight: 600; color: var(--c-text2);
+  text-align: center;
+  border-bottom: 1px solid var(--c-border);
+  border-left: 1px solid var(--c-border);
+}
+.schedule-grid td {
+  vertical-align: top;
+  padding: 6px;
+  border-bottom: 1px solid var(--c-border);
+  border-left: 1px solid var(--c-border);
+  min-height: 60px;
+  width: 18%;
+}
+.schedule-grid .period-label {
+  background: var(--c-surface2);
+  font-size: .78rem; color: var(--c-text2);
+  text-align: center; font-weight: 600;
+  padding: 8px 4px;
+  width: 10%;
+}
+.slot-card {
+  background: rgba(31,111,235,.12);
+  border: 1px solid rgba(31,111,235,.3);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: .78rem;
+}
+.slot-card .slot-subject { font-weight: 600; color: var(--c-accent2); margin-bottom: 2px; }
+.slot-card .slot-teacher { color: var(--c-text2); }
+.slot-empty { height: 54px; }
+
+/* ═══════════════════════════════════════
+   PROGRESS BAR
+═══════════════════════════════════════ */
+.progress-bar {
+  background: var(--c-border2);
+  border-radius: 4px; height: 6px;
+  overflow: hidden; margin-top: 4px;
+}
+.progress-fill { height: 100%; border-radius: 4px; transition: width .5s ease; }
+.progress-low    { background: var(--c-green2); }
+.progress-mid    { background: var(--c-yellow2); }
+.progress-high   { background: var(--c-red2); }
+
+/* ═══════════════════════════════════════
+   SECTION HEADERS
+═══════════════════════════════════════ */
+.page-header {
+  margin-bottom: 24px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.page-header h2 { font-size: 1.3rem; font-weight: 700; }
+.page-header p  { color: var(--c-text2); font-size: .85rem; margin-top: 2px; }
+.divider { height: 1px; background: var(--c-border); margin: 24px 0; }
+
+/* ═══════════════════════════════════════
+   CALENDAR EVENTS
+═══════════════════════════════════════ */
+.event-row-expired { opacity: .55; }
+.event-row-soon td:first-child { border-right: 3px solid var(--c-yellow2) !important; }
+.event-row-future td:first-child { border-right: 3px solid var(--c-green2) !important; }
+.days-badge {
+  font-family: var(--mono);
+  font-size: .78rem; font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════
+   ALERTS STRIP
+═══════════════════════════════════════ */
+.alerts-strip {
+  background: rgba(227,179,65,.08);
+  border: 1px solid rgba(227,179,65,.2);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.alert-pill {
+  background: rgba(227,179,65,.15);
+  color: var(--c-yellow2);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: .8rem;
+}
+
+/* ═══════════════════════════════════════
+   LOADING
+═══════════════════════════════════════ */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--c-border2);
+  border-top-color: var(--c-accent2);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-overlay {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 200px; gap: 12px; color: var(--c-text2);
+}
+
+/* ═══════════════════════════════════════
+   REPORT CARDS
+═══════════════════════════════════════ */
+.teacher-load-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.load-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius2);
+  padding: 18px;
+}
+.load-card .name { font-weight: 600; margin-bottom: 4px; }
+.load-card .meta { font-size: .78rem; color: var(--c-text2); margin-bottom: 10px; }
+.load-nums { display: flex; justify-content: space-between; font-size: .8rem; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     TOAST
+═══════════════════════════════════════ -->
+<div id="toast-container"></div>
+
+<!-- ═══════════════════════════════════════
+     LOGIN PAGE
+═══════════════════════════════════════ -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="logo-icon">🎓</div>
+      <div class="logo-text">
+        <h1>نظام TMS</h1>
+        <p>إدارة مركز التدريب</p>
+      </div>
+    </div>
+    <h2>تسجيل الدخول</h2>
+    <p class="subtitle">أدخل بيانات حسابك للمتابعة</p>
+    <div class="login-error" id="login-error"></div>
+
+    <div class="quick-accounts">
+      <p>⚡ حسابات تجريبية سريعة</p>
+      <div class="quick-btns">
+        <button class="quick-btn" onclick="quickLogin('admin@center.sa')">🔑 مدير نظام</button>
+        <button class="quick-btn" onclick="quickLogin('manager@center.sa')">👔 مدير</button>
+        <button class="quick-btn" onclick="quickLogin('dataentry@center.sa')">📝 مدخل بيانات</button>
+        <button class="quick-btn" onclick="quickLogin('teacher@center.sa')">👨‍🏫 معلم</button>
+        <button class="quick-btn" onclick="quickLogin('trainee@center.sa')">🎓 متدرب</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>البريد الإلكتروني</label>
+      <input id="login-email" class="field-input" type="email" placeholder="example@center.sa" autocomplete="email">
+    </div>
+    <div class="field">
+      <label>كلمة المرور</label>
+      <input id="login-password" class="field-input" type="password" placeholder="••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary btn-full" id="login-btn" onclick="doLogin()">
+      <span id="login-btn-text">تسجيل الدخول</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     APP SHELL
+═══════════════════════════════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">🎓</div>
+      <div class="sidebar-brand">
+        <h2>TMS</h2>
+        <p id="sidebar-term">الإصدار 1.0</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <!-- rendered by JS -->
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar" id="user-avatar" style="background:var(--c-accent)">م</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name-display">—</div>
+          <div class="user-role" id="user-role-display">—</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">🚪 تسجيل الخروج</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-title" id="topbar-title">لوحة التحكم</div>
+      <div class="topbar-actions" id="topbar-actions"></div>
+    </header>
+    <main class="page-content" id="page-content">
+      <div class="loading-overlay"><div class="spinner"></div><span>جارٍ التحميل…</span></div>
+    </main>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     MODAL CONTAINER
+═══════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeModalOnBackdrop(event)">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-title">—</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+const API = window.location.hostname === 'localhost' 
+  ? 'http://localhost:3002/api' 
+  : window.location.origin + '/api';
+let currentUser = null;
+let currentPage = null;
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function token() { return localStorage.getItem('tms_token'); }
+
+async function api(method, endpoint, body = null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token()}` }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + endpoint, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'خطأ غير معروف');
+  return data;
+}
+
+async function apiUpload(endpoint, formData) {
+  const res = await fetch(API + endpoint, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token()}` },
+    body: formData
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'خطأ في الرفع');
+  return data;
+}
+
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+  el.innerHTML = `<span>${icons[type]||'•'}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function setLoading(show) {
+  const el = document.getElementById('page-content');
+  if (show) el.innerHTML = `<div class="loading-overlay"><div class="spinner"></div><span>جارٍ التحميل…</span></div>`;
+}
+
+function roleName(role) {
+  return { admin:'مدير النظام', manager:'مدير', dataentry:'مدخل بيانات', teacher:'معلم', trainee:'متدرب' }[role] || role;
+}
+
+function roleColor(role) {
+  return { admin:'#da3633', manager:'#1f6feb', dataentry:'#6e40c9', teacher:'#2ea043', trainee:'#e3b341' }[role] || '#888';
+}
+
+function statusBadge(status) {
+  const map = {
+    'نشط': 'green', 'متاح': 'green', 'معتمد': 'green',
+    'منسحب': 'red', 'غير متاح': 'red', 'غير معتمد': 'red',
+    'تحت الاعتماد': 'yellow', 'مطوي قيده': 'yellow', 'غير نشط': 'gray',
+    'مشروع': 'purple', 'عام': 'blue',
+    'حضوري': 'blue', 'عن بعد': 'teal', 'مدمج': 'purple'
+  };
+  return `<span class="badge badge-${map[status]||'gray'}">${status}</span>`;
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════
+function openModal(title, bodyHtml, footerHtml = '', large = false) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = footerHtml;
+  const box = document.getElementById('modal-box');
+  box.className = large ? 'modal modal-lg' : 'modal';
+  document.getElementById('modal-backdrop').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+}
+function closeModalOnBackdrop(e) {
+  if (e.target === document.getElementById('modal-backdrop')) closeModal();
+}
+
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+function quickLogin(email) {
+  document.getElementById('login-email').value = email;
+  document.getElementById('login-password').value = '123456';
+}
+
+document.getElementById('login-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+
+  if (!email || !password) {
+    errEl.textContent = 'يرجى إدخال البريد الإلكتروني وكلمة المرور';
+    errEl.className = 'login-error show';
+    return;
+  }
+
+  btn.disabled = true;
+  document.getElementById('login-btn-text').textContent = 'جارٍ تسجيل الدخول…';
+
+  try {
+    const data = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    }).then(r => r.json());
+
+    if (data.error) throw new Error(data.error);
+
+    localStorage.setItem('tms_token', data.token);
+    currentUser = data.user;
+    showApp();
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.className = 'login-error show';
+    btn.disabled = false;
+    document.getElementById('login-btn-text').textContent = 'تسجيل الدخول';
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('tms_token');
+  currentUser = null;
+  document.getElementById('app').className = '';
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+  document.getElementById('login-error').className = 'login-error';
+}
+
+// ═══════════════════════════════════════
+// NAV DEFINITION
+// ═══════════════════════════════════════
+const NAV = [
+  { section: 'الرئيسية' },
+  { id: 'dashboard',     icon: '📊', label: 'لوحة التحكم',      roles: ['admin','manager','dataentry','teacher','trainee'] },
+  { section: 'الإدارة الأكاديمية' },
+  { id: 'programs',      icon: '📚', label: 'البرامج',           roles: ['admin','manager','dataentry'] },
+  { id: 'subjects',      icon: '📖', label: 'المواد الدراسية',   roles: ['admin','manager','dataentry'] },
+  { id: 'teachers',      icon: '👨‍🏫', label: 'المعلمون',          roles: ['admin','manager','dataentry'] },
+  { id: 'sections',      icon: '🏫', label: 'الشعب',             roles: ['admin','manager','dataentry'] },
+  { id: 'trainees',      icon: '🎓', label: 'المتدربون',         roles: ['admin','manager','dataentry'] },
+  { section: 'الجداول' },
+  { id: 'schedule',      icon: '📅', label: 'الجداول الدراسية',  roles: ['admin','manager','dataentry','teacher','trainee'] },
+  { id: 'generate',      icon: '⚙️', label: 'توليد الجدول',      roles: ['admin','manager','dataentry'] },
+  { id: 'rules',         icon: '📋', label: 'قواعد الجدولة',     roles: ['admin','manager'] },
+  { section: 'أخرى' },
+  { id: 'calendar',      icon: '🗓️', label: 'التقويم التدريبي',  roles: ['admin','manager','dataentry'] },
+  { id: 'classsystems',  icon: '🔢', label: 'أنظمة الفصول',      roles: ['admin','manager'] },
+  { id: 'reports',       icon: '📈', label: 'التقارير',           roles: ['admin','manager'] },
+  { id: 'users',         icon: '👥', label: 'المستخدمون',         roles: ['admin'] },
+];
+
+function buildSidebar() {
+  const nav = document.getElementById('sidebar-nav');
+  nav.innerHTML = '';
+  let sectionEl = null;
+
+  for (const item of NAV) {
+    if (item.section) {
+      sectionEl = document.createElement('div');
+      sectionEl.className = 'nav-section';
+      sectionEl.innerHTML = `<div class="nav-section-title">${item.section}</div>`;
+      nav.appendChild(sectionEl);
+      continue;
+    }
+    if (!item.roles.includes(currentUser.role)) continue;
+    const btn = document.createElement('button');
+    btn.className = 'nav-item';
+    btn.dataset.page = item.id;
+    btn.innerHTML = `<span class="nav-icon">${item.icon}</span><span>${item.label}</span>`;
+    btn.onclick = () => navigate(item.id);
+    sectionEl.appendChild(btn);
+  }
+}
+
+function setActiveNav(pageId) {
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.page === pageId);
+  });
+}
+
+// ═══════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════
+function showApp() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('app').className = 'visible';
+
+  // user info
+  const avatar = document.getElementById('user-avatar');
+  avatar.textContent = currentUser.name[0];
+  avatar.style.background = roleColor(currentUser.role);
+  document.getElementById('user-name-display').textContent = currentUser.name;
+  document.getElementById('user-role-display').textContent = roleName(currentUser.role);
+
+  buildSidebar();
+
+  // First page based on role
+  const firstPage = { teacher: 'schedule', trainee: 'schedule' }[currentUser.role] || 'dashboard';
+  navigate(firstPage);
+}
+
+async function navigate(pageId) {
+  currentPage = pageId;
+  setActiveNav(pageId);
+  const label = NAV.find(n => n.id === pageId)?.label || pageId;
+  document.getElementById('topbar-title').textContent = label;
+  document.getElementById('topbar-actions').innerHTML = '';
+  setLoading(true);
+
+  try {
+    await pages[pageId]?.();
+  } catch (e) {
+    document.getElementById('page-content').innerHTML =
+      `<div class="loading-overlay" style="color:var(--c-red2)">❌ ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════
+// PAGES
+// ═══════════════════════════════════════
+const pages = {};
+
+// ── DASHBOARD ─────────────────────────────────
+pages.dashboard = async () => {
+  const stats = await api('GET', '/reports/overview');
+  const load  = await api('GET', '/reports/teacher-load');
+
+  const pc = document.getElementById('page-content');
+  pc.innerHTML = `
+    <div class="page-header">
+      <div><h2>مرحباً، ${escHtml(currentUser.name)} 👋</h2>
+      <p>نظرة عامة على حالة النظام الآن</p></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon">📚</div>
+        <div class="stat-value">${stats.programs}</div>
+        <div class="stat-label">برامج تدريبية</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon">📖</div>
+        <div class="stat-value">${stats.subjects}</div>
+        <div class="stat-label">مواد دراسية</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">👨‍🏫</div>
+        <div class="stat-value">${stats.availableTeachers}<span style="font-size:1rem;color:var(--c-text2)">/${stats.teachers}</span></div>
+        <div class="stat-label">معلمون متاحون</div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-icon">🏫</div>
+        <div class="stat-value">${stats.sections}</div>
+        <div class="stat-label">شعب دراسية</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon">🎓</div>
+        <div class="stat-value">${stats.trainees}</div>
+        <div class="stat-label">متدربون نشطون</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon">📅</div>
+        <div class="stat-value">${stats.scheduledSlots}</div>
+        <div class="stat-label">حصص مجدولة</div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:14px;font-size:.95rem;">نصاب المعلمين</h3>
+    <div class="teacher-load-grid">
+      ${load.map(t => {
+        const pct = Math.round((t.currentLoad / t.maxLoad) * 100);
+        const cls = pct >= 80 ? 'high' : pct >= 50 ? 'mid' : 'low';
+        const status = t.available && t.approvalStatus === 'معتمد'
+          ? '<span class="badge badge-green">متاح</span>'
+          : '<span class="badge badge-red">غير متاح</span>';
+        return `
+        <div class="load-card">
+          <div class="name">${escHtml(t.name)} ${status}</div>
+          <div class="meta">${escHtml(t.approvalStatus)}</div>
+          <div class="load-nums">
+            <span>${t.currentLoad} حصة</span>
+            <span style="color:var(--c-text2)">من ${t.maxLoad}</span>
+            <span style="font-family:var(--mono)">${pct}%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill progress-${cls}" style="width:${pct}%"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+};
+
+// ── PROGRAMS ──────────────────────────────────
+pages.programs = async () => {
+  const data = await api('GET', '/programs');
+  const actions = document.getElementById('topbar-actions');
+  actions.innerHTML = `<button class="btn btn-success" onclick="openProgramModal()">+ إضافة برنامج</button>`;
+
+  renderTable('page-content', 'البرامج التدريبية', `${data.length} برنامج`,
+    ['الاسم','النوع','التصنيف','نمط التدريب','العميل','إجراءات'],
+    data.map(p => [
+      `<strong>${escHtml(p.name)}</strong>`,
+      escHtml(p.type),
+      statusBadge(p.classification),
+      statusBadge(p.deliveryMode),
+      escHtml(p.clientName || '—'),
+      `<div class="actions">
+        <button class="btn btn-ghost btn-icon" title="تعديل" onclick='openProgramModal(${JSON.stringify(p)})'>✏️</button>
+        <button class="btn btn-danger btn-icon" title="حذف" onclick="deleteItem('programs','${p.id}','programs')">🗑️</button>
+      </div>`
+    ])
+  );
+};
+
+function openProgramModal(p = null) {
+  const isEdit = !!p;
+  openModal(isEdit ? 'تعديل برنامج' : 'إضافة برنامج', `
+    <div class="form-grid">
+      <div class="field full"><label>اسم البرنامج *</label>
+        <input id="pm-name" class="field-input" value="${escHtml(p?.name||'')}"></div>
+      <div class="field"><label>النوع *</label>
+        <select id="pm-type" class="field-input">
+          ${['دبلوم متوسط','دبلوم مشارك','برنامج تأهيلي','دورة تأهيلية','دورة تطويرية','ورشة عمل'].map(t=>`<option ${p?.type===t?'selected':''}>${t}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>التصنيف</label>
+        <select id="pm-class" class="field-input" onchange="toggleClient()">
+          <option ${p?.classification==='عام'?'selected':''}>عام</option>
+          <option ${p?.classification==='مشروع'?'selected':''}>مشروع</option>
+        </select></div>
+      <div class="field"><label>نمط التدريب</label>
+        <select id="pm-mode" class="field-input">
+          ${['حضوري','عن بعد','مدمج'].map(m=>`<option ${p?.deliveryMode===m?'selected':''}>${m}</option>`).join('')}
+        </select></div>
+      <div class="field" id="pm-client-field" style="${p?.classification==='مشروع'?'':'display:none'}" ><label>اسم العميل</label>
+        <input id="pm-client" class="field-input" value="${escHtml(p?.clientName||'')}"></div>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+     <button class="btn btn-primary" onclick="saveProgram('${p?.id||''}')">💾 حفظ</button>`
+  );
+}
+
+function toggleClient() {
+  const v = document.getElementById('pm-class').value;
+  document.getElementById('pm-client-field').style.display = v === 'مشروع' ? '' : 'none';
+}
+
+async function saveProgram(id) {
+  const body = {
+    name: document.getElementById('pm-name').value.trim(),
+    type: document.getElementById('pm-type').value,
+    classification: document.getElementById('pm-class').value,
+    deliveryMode: document.getElementById('pm-mode').value,
+    clientName: document.getElementById('pm-client')?.value?.trim() || '',
+    status: 'نشط'
+  };
+  if (!body.name) { toast('اسم البرنامج مطلوب', 'error'); return; }
+  try {
+    if (id) { await api('PUT', `/programs/${id}`, body); toast('تم تعديل البرنامج'); }
+    else     { await api('POST', '/programs', body); toast('تمت إضافة البرنامج'); }
+    closeModal(); pages.programs();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── SUBJECTS ──────────────────────────────────
+pages.subjects = async () => {
+  const [subjects, programs] = await Promise.all([
+    api('GET', '/subjects'), api('GET', '/programs')
+  ]);
+  const programMap = Object.fromEntries(programs.map(p => [p.id, p.name]));
+
+  const actions = document.getElementById('topbar-actions');
+  actions.innerHTML = `
+    <select id="filter-program" class="field-input" style="width:180px" onchange="pages.subjects()">
+      <option value="">كل البرامج</option>
+      ${programs.map(p=>`<option value="${p.id}" ${document.getElementById('filter-program')?.value===p.id?'selected':''}>${escHtml(p.name)}</option>`).join('')}
+    </select>
+    <button class="btn btn-success" onclick="openSubjectModal(null,${JSON.stringify(programs).replace(/"/g,'&quot;')})">+ إضافة مادة</button>
+    <button class="btn btn-ghost" onclick="downloadTemplate('subjects')" title="تحميل قالب Excel">📥 قالب Excel</button>`;
+
+  const filterId = document.getElementById('filter-program')?.value;
+  const filtered = filterId ? subjects.filter(s => s.programId === filterId) : subjects;
+
+  renderTable('page-content', 'المواد الدراسية', `${filtered.length} مادة`,
+    ['الكود','الاسم','البرنامج','الفصل','الجزء','الوحدات','الساعات/أسبوع','إجراءات'],
+    filtered.map(s => [
+      `<span class="badge badge-blue" style="font-family:var(--mono)">${escHtml(s.courseCode)}</span>`,
+      escHtml(s.name),
+      escHtml(programMap[s.programId] || '—'),
+      `<span class="badge badge-gray">فصل ${s.semester}</span>`,
+      `<span class="badge badge-gray">ج${s.part}</span>`,
+      s.creditHours,
+      s.weeklyHours,
+      `<div class="actions">
+        <button class="btn btn-ghost btn-icon" onclick='openSubjectModal(${JSON.stringify(s)},${JSON.stringify(programs).replace(/'/g,"&#39;")})'>✏️</button>
+        <button class="btn btn-danger btn-icon" onclick="deleteItem('subjects','${s.id}','subjects')">🗑️</button>
+      </div>`
+    ])
+  );
+};
+
+function openSubjectModal(s, programs) {
+  openModal(s ? 'تعديل مادة' : 'إضافة مادة', `
+    <div class="form-grid">
+      <div class="field"><label>رمز المادة *</label>
+        <input id="sm-code" class="field-input" placeholder="BUS101" value="${escHtml(s?.courseCode||'')}"></div>
+      <div class="field"><label>اسم المادة *</label>
+        <input id="sm-name" class="field-input" value="${escHtml(s?.name||'')}"></div>
+      <div class="field full"><label>البرنامج *</label>
+        <select id="sm-prog" class="field-input">
+          ${programs.map(p=>`<option value="${p.id}" ${s?.programId===p.id?'selected':''}>${escHtml(p.name)}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>الفصل الدراسي</label>
+        <select id="sm-sem" class="field-input">${[1,2,3,4,5].map(n=>`<option ${s?.semester===n?'selected':''}>${n}</option>`).join('')}</select></div>
+      <div class="field"><label>الجزء</label>
+        <select id="sm-part" class="field-input">${[1,2].map(n=>`<option ${s?.part===n?'selected':''}>${n}</option>`).join('')}</select></div>
+      <div class="field"><label>الوحدات المعتمدة</label>
+        <input id="sm-credits" class="field-input" type="number" min="0" value="${s?.creditHours||3}"></div>
+      <div class="field"><label>الساعات الأسبوعية</label>
+        <input id="sm-weekly" class="field-input" type="number" min="0" value="${s?.weeklyHours||3}"></div>
+      <div class="field"><label>ساعات نظري</label>
+        <input id="sm-lec" class="field-input" type="number" min="0" value="${s?.lectureHours||2}"></div>
+      <div class="field"><label>ساعات عملي</label>
+        <input id="sm-prac" class="field-input" type="number" min="0" value="${s?.practicalHours||0}"></div>
+      <div class="field"><label>ساعات تمارين</label>
+        <input id="sm-tut" class="field-input" type="number" min="0" value="${s?.tutorialHours||0}"></div>
+      <div class="field full"><label>المتطلب السابق (رمز المادة)</label>
+        <input id="sm-pre" class="field-input" placeholder="BUS101" value="${escHtml(s?.prerequisite||'')}"></div>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+     <button class="btn btn-primary" onclick="saveSubject('${s?.id||''}')">💾 حفظ</button>`,
+    true
+  );
+}
+
+async function saveSubject(id) {
+  const body = {
+    courseCode: document.getElementById('sm-code').value.trim().toUpperCase(),
+    name: document.getElementById('sm-name').value.trim(),
+    programId: document.getElementById('sm-prog').value,
+    semester: parseInt(document.getElementById('sm-sem').value),
+    part: parseInt(document.getElementById('sm-part').value),
+    creditHours: parseFloat(document.getElementById('sm-credits').value),
+    weeklyHours: parseFloat(document.getElementById('sm-weekly').value),
+    lectureHours: parseFloat(document.getElementById('sm-lec').value),
+    practicalHours: parseFloat(document.getElementById('sm-prac').value),
+    tutorialHours: parseFloat(document.getElementById('sm-tut').value),
+    prerequisite: document.getElementById('sm-pre').value.trim()
+  };
+  if (!body.courseCode || !body.name) { toast('الرمز والاسم مطلوبان', 'error'); return; }
+  try {
+    if (id) { await api('PUT', `/subjects/${id}`, body); toast('تم تعديل المادة'); }
+    else     { await api('POST', '/subjects', body); toast('تمت إضافة المادة'); }
+    closeModal(); pages.subjects();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── TEACHERS ──────────────────────────────────
+pages.teachers = async () => {
+  const [teachers, subjects] = await Promise.all([
+    api('GET', '/teachers'), api('GET', '/subjects')
+  ]);
+  const subjectMap = Object.fromEntries(subjects.map(s => [s.id, s.name]));
+
+  const actions = document.getElementById('topbar-actions');
+  actions.innerHTML = `
+    <button class="btn btn-success" onclick='openTeacherModal(null,${JSON.stringify(subjects).replace(/"/g,"&quot;")})'>+ إضافة معلم</button>
+    <button class="btn btn-ghost" onclick="downloadTemplate('teachers')">📥 قالب Excel</button>`;
+
+  renderTable('page-content', 'المعلمون', `${teachers.length} معلم`,
+    ['الاسم','الجوال','طبيعة العمل','الاعتماد','الحالة','النصاب','المواد','إجراءات'],
+    teachers.map(t => [
+      `<strong>${escHtml(t.name)}</strong><br><small style="color:var(--c-text2)">${escHtml(t.email)}</small>`,
+      escHtml(t.phone || '—'),
+      statusBadge(t.employmentType),
+      statusBadge(t.approvalStatus),
+      t.available ? statusBadge('متاح') : statusBadge('غير متاح'),
+      `<span style="font-family:var(--mono)">${t.maxLoad||16}</span>`,
+      (t.subjectIds||[]).map(id => `<span class="badge badge-blue" style="margin:2px;font-size:.7rem">${escHtml(subjectMap[id]||id)}</span>`).join(''),
+      `<div class="actions">
+        <button class="btn btn-ghost btn-icon" onclick='openTeacherModal(${JSON.stringify(t)},${JSON.stringify(subjects).replace(/'/g,"&#39;")})'>✏️</button>
+        <button class="btn btn-danger btn-icon" onclick="deleteItem('teachers','${t.id}','teachers')">🗑️</button>
+      </div>`
+    ])
+  );
+};
+
+function openTeacherModal(t, subjects) {
+  openModal(t ? 'تعديل معلم' : 'إضافة معلم', `
+    <div class="form-grid">
+      <div class="field"><label>رقم الهوية *</label>
+        <input id="tm-id" class="field-input" value="${escHtml(t?.idNumber||'')}"></div>
+      <div class="field"><label>الاسم *</label>
+        <input id="tm-name" class="field-input" value="${escHtml(t?.name||'')}"></div>
+      <div class="field"><label>البريد الإلكتروني</label>
+        <input id="tm-email" class="field-input" type="email" value="${escHtml(t?.email||'')}"></div>
+      <div class="field"><label>رقم الجوال</label>
+        <input id="tm-phone" class="field-input" value="${escHtml(t?.phone||'')}"></div>
+      <div class="field"><label>المسمى الوظيفي</label>
+        <input id="tm-title" class="field-input" value="${escHtml(t?.jobTitle||'محاضر')}"></div>
+      <div class="field"><label>طبيعة العمل</label>
+        <select id="tm-emp" class="field-input">
+          <option ${t?.employmentType==='دوام كامل'?'selected':''}>دوام كامل</option>
+          <option ${t?.employmentType==='متعاون'?'selected':''}>متعاون</option>
+        </select></div>
+      <div class="field"><label>حالة الاعتماد</label>
+        <select id="tm-appr" class="field-input">
+          <option ${t?.approvalStatus==='معتمد'?'selected':''}>معتمد</option>
+          <option ${t?.approvalStatus==='تحت الاعتماد'?'selected':''}>تحت الاعتماد</option>
+          <option ${t?.approvalStatus==='غير معتمد'?'selected':''}>غير معتمد</option>
+        </select></div>
+      <div class="field"><label>الحالة</label>
+        <select id="tm-avail" class="field-input">
+          <option value="true" ${t?.available!==false?'selected':''}>متاح</option>
+          <option value="false" ${t?.available===false?'selected':''}>غير متاح</option>
+        </select></div>
+      <div class="field"><label>النصاب الأقصى</label>
+        <input id="tm-load" class="field-input" type="number" value="${t?.maxLoad||16}"></div>
+      <div class="field full"><label>المواد التي يدرسها</label>
+        <select id="tm-subjects" class="field-input" multiple style="height:100px">
+          ${subjects.map(s=>`<option value="${s.id}" ${(t?.subjectIds||[]).includes(s.id)?'selected':''}>${escHtml(s.courseCode+' - '+s.name)}</option>`).join('')}
+        </select>
+        <small style="color:var(--c-text2)">اضغط Ctrl لتحديد أكثر من مادة</small>
+      </div>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+     <button class="btn btn-primary" onclick="saveTeacher('${t?.id||''}')">💾 حفظ</button>`,
+    true
+  );
+}
+
+async function saveTeacher(id) {
+  const sel = document.getElementById('tm-subjects');
+  const subjectIds = Array.from(sel.selectedOptions).map(o => o.value);
+  const body = {
+    idNumber: document.getElementById('tm-id').value.trim(),
+    name: document.getElementById('tm-name').value.trim(),
+    email: document.getElementById('tm-email').value.trim(),
+    phone: document.getElementById('tm-phone').value.trim(),
+    jobTitle: document.getElementById('tm-title').value.trim(),
+    employmentType: document.getElementById('tm-emp').value,
+    approvalStatus: document.getElementById('tm-appr').value,
+    available: document.getElementById('tm-avail').value === 'true',
+    maxLoad: parseInt(document.getElementById('tm-load').value),
+    subjectIds
+  };
+  if (!body.idNumber || !body.name) { toast('رقم الهوية والاسم مطلوبان', 'error'); return; }
+  try {
+    if (id) { await api('PUT', `/teachers/${id}`, body); toast('تم تعديل المعلم'); }
+    else     { await api('POST', '/teachers', body); toast('تمت إضافة المعلم'); }
+    closeModal(); pages.teachers();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── SECTIONS ──────────────────────────────────
+pages.sections = async () => {
+  const [sections, programs] = await Promise.all([
+    api('GET', '/sections'), api('GET', '/programs')
+  ]);
+  const programMap = Object.fromEntries(programs.map(p => [p.id, p.name]));
+
+  const actions = document.getElementById('topbar-actions');
+  actions.innerHTML = `<button class="btn btn-success" onclick='openSectionModal(${JSON.stringify(programs).replace(/"/g,"&quot;")})'>+ إضافة شعبة</button>`;
+
+  renderTable('page-content', 'الشعب الدراسية', `${sections.length} شعبة`,
+    ['رقم الشعبة','البرنامج','الفصل','الجزء','عدد المتدربين','إجراءات'],
+    sections.map(s => [
+      `<strong>${escHtml(s.number)}</strong>`,
+      escHtml(programMap[s.programId] || '—'),
+      `<span class="badge badge-gray">فصل ${s.semester}</span>`,
+      `<span class="badge badge-gray">جزء ${s.part}</span>`,
+      `<span class="badge badge-blue">${s.traineeCount} متدرب</span>`,
+      `<div class="actions">
+        <button class="btn btn-ghost btn-icon" onclick="navigate('trainees')" title="عرض المتدربين">👥</button>
+        <button class="btn btn-danger btn-icon" onclick="deleteItem('sections','${s.id}','sections')">🗑️</button>
+      </div>`
+    ])
+  );
+};
+
+function openSectionModal(programs) {
+  openModal('إضافة شعبة', `
+    <div class="form-grid">
+      <div class="field"><label>رقم الشعبة *</label>
+        <input id="sec-num" class="field-input" placeholder="A1"></div>
+      <div class="field"><label>البرنامج *</label>
+        <select id="sec-prog" class="field-input">
+          ${programs.map(p=>`<option value="${p.id}">${escHtml(p.name)}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>الفصل الدراسي</label>
+        <select id="sec-sem" class="field-input">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join('')}</select></div>
+      <div class="field"><label>الجزء</label>
+        <select id="sec-part" class="field-input">${[1,2].map(n=>`<option>${n}</option>`).join('')}</select></div>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+     <button class="btn btn-primary" onclick="saveSection()">💾 حفظ</button>`
+  );
+}
+
+async function saveSection() {
+  const body = {
+    number: document.getElementById('sec-num').value.trim(),
+    programId: document.getElementById('sec-prog').value,
+    semester: parseInt(document.getElementById('sec-sem').value),
+    part: parseInt(document.getElementById('sec-part').value)
+  };
+  if (!body.number) { toast('رقم الشعبة مطلوب', 'error'); return; }
+  try {
+    await api('POST', '/sections', body);
+    toast('تمت إضافة الشعبة');
+    closeModal(); pages.sections();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── TRAINEES ──────────────────────────────────
+pages.trainees = async () => {
+  const [trainees, sections] = await Promise.all([
+    api('GET', '/trainees'), api('GET', '/sections')
+  ]);
+  const sectionMap = Object.fromEntries(sections.map(s => [s.id, s.number]));
+
+  const actions = document.getElementById('topbar-actions');
+  actions.innerHTML = `
+    <button class="btn btn-success" onclick='openTraineeModal(null,${JSON.stringify(sections).replace(/"/g,"&quot;")})'>+ إضافة متدرب</button>
+    <button class="btn btn-ghost" onclick="downloadTemplate('trainees')">📥 قالب Excel</button>
+    <button class="btn btn-ghost" onclick='openUploadModal("trainees")'>📤 رفع Excel</button>`;
+
+  renderTable('page-content', 'المتدربون', `${trainees.length} متدرب`,
+    ['الاسم','البريد','الجوال','الشعبة','الفصل','الجزء','الحالة','إجراءات'],
+    trainees.map(t => [
+      `<strong>${escHtml(t.name)}</strong>`,
+      escHtml(t.email || '—'),
+      escHtml(t.phone || '—'),
+      `<span class="badge badge-blue">${escHtml(sectionMap[t.sectionId] || '—')}</span>`,
+      `فصل ${t.semester}`,
+      `ج${t.part}`,
+      statusBadge(t.status),
+      `<div class="actions">
+        <button class="btn btn-ghost btn-icon" onclick='openTraineeModal(${JSON.stringify(t)},${JSON.stringify(sections).replace(/'/g,"&#39;")})'>✏️</button>
+        <button class="btn btn-danger btn-icon" onclick="deleteItem('trainees','${t.id}','trainees')">🗑️</button>
+      </div>`
+    ])
+  );
+};
+
+function openTraineeModal(t, sections) {
+  openModal(t ? 'تعديل متدرب' : 'إضافة متدرب', `
+    <div class="form-grid">
+      <div class="field"><label>الاسم *</label>
+        <input id="trn-name" class="field-input" value="${escHtml(t?.name||'')}"></div>
+      <div class="field"><label>رقم الهوية *</label>
+        <input id="trn-id" class="field-input" value="${escHtml(t?.idNumber||'')}"></div>
+      <div class="field"><label>البريد الإلكتروني</label>
+        <input id="trn-email" class="field-input" type="email" value="${escHtml(t?.email||'')}"></div>
+      <div class="field"><label>رقم الجوال</label>
+        <input id="trn-phone" class="field-input" value="${escHtml(t?.phone||'')}"></div>
+      <div class="field"><label>الشعبة</label>
+        <select id="trn-sec" class="field-input">
+          ${sections.map(s=>`<option value="${s.id}" ${t?.sectionId===s.id?'selected':''}>${escHtml(s.number)} - ف${s.semester}/ج${s.part}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>الفصل الدراسي</label>
+        <select id="trn-sem" class="field-input">${[1,2,3,4,5].map(n=>`<option ${t?.semester===n?'selected':''}>${n}</option>`).join('')}</select></div>
+      <div class="field"><label>الجزء</label>
+        <select id="trn-part" class="field-input">${[1,2].map(n=>`<option ${t?.part===n?'selected':''}>${n}</option>`).join('')}</select></div>
+      <div class="field"><label>الحالة</label>
+        <select id="trn-status" class="field-input">
+          ${['نشط','منسحب','مطوي قيده','غير نشط'].map(s=>`<option ${t?.status===s?'selected':''}>${s}</option>`).join('')}
+        </select></div>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+     <button class="btn btn-primary" onclick="saveTrainee('${t?.id||''}')">💾 حفظ</button>`,
+    true
+  );
+}
+
+async function saveTrainee(id) {
+  const body = {
+    name: document.getElementById('trn-name').value.trim(),
+    idNumber: document.getElementById('trn-id').value.trim(),
+    email: document.getElementById('trn-email').value.trim(),
+    phone: document.getElementById('trn-phone').value.trim(),
+    sectionId: document.getElementById('trn-sec').value,
+    semester: parseInt(document.getElementById('trn-sem').value),
+    part: parseInt(document.getElementById('trn-part').value),
+    status: document.getElementById('trn-status').value
+  };
+  if (!body.name || !body.idNumber) { toast('الاسم ورقم الهوية مطلوبان', 'error'); return; }
+  try {
+    if (id) { await api('PUT', `/trainees/${id}`, body); toast('تم تعديل المتدرب'); }
+    else     { await api('POST', '/trainees', body); toast('تمت إضافة المتدرب'); }
+    closeModal(); pages.trainees();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── SCHEDULE ──────────────────────────────────
+pages.schedule = async () => {
+  const [sections, programs] = await Promise.all([
+    api('GET', '/sections'), api('GET', '/programs')
+  ]);
+  const programMap = Object.fromEntries(programs.map(p => [p.id, p.name]));
+
+  const pc = document.getElementById('page-content');
+  pc.innerHTML = `
+    <div class="page-header">
+      <div><h2>الجداول الدراسية</h2><p>عرض الجدول الأسبوعي لكل شعبة</p></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
+      <select id="sched-section" class="field-input" style="width:220px" onchange="loadScheduleGrid()">
+        <option value="">-- اختر شعبة --</option>
+        ${sections.map(s=>`<option value="${s.id}">${escHtml(s.number)} (${escHtml(programMap[s.programId]||'')}) - ف${s.semester}/ج${s.part}</option>`).join('')}
+      </select>
+      <select id="sched-week" class="field-input" style="width:140px" onchange="loadScheduleGrid()">
+        ${[1,2,3,4,5,6,7,8,9,10].map(w=>`<option value="${w}">الأسبوع ${w}</option>`).join('')}
+      </select>
+    </div>
+    <div id="schedule-grid-container">
+      <div class="empty-state"><div class="empty-icon">📅</div><p>اختر شعبة لعرض جدولها</p></div>
+    </div>`;
+};
+
+async function loadScheduleGrid() {
+  const sectionId = document.getElementById('sched-section').value;
+  const week = document.getElementById('sched-week').value;
+  if (!sectionId) return;
+
+  const container = document.getElementById('schedule-grid-container');
+  container.innerHTML = `<div class="loading-overlay"><div class="spinner"></div><span>جارٍ تحميل الجدول…</span></div>`;
+
+  const slots = await api('GET', `/schedule?sectionId=${sectionId}&weekNumber=${week}`);
+  const DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+  const PERIODS = [
+    {id:1,label:'الفترة الأولى<br><small>5:00 - 5:40</small>'},
+    {id:2,label:'الفترة الثانية<br><small>5:40 - 6:20</small>'},
+    {id:3,label:'الفترة الثالثة<br><small>6:30 - 7:10</small>'},
+    {id:4,label:'الفترة الرابعة<br><small>7:10 - 7:50</small>'}
+  ];
+
+  const slotMap = {};
+  for (const s of slots) slotMap[`${s.day}_${s.period}`] = s;
+
+  container.innerHTML = `
+    <div class="schedule-grid-wrap">
+      <div class="schedule-grid">
+        <table>
+          <thead><tr>
+            <th style="width:12%">الفترة</th>
+            ${DAYS.map(d=>`<th>${d}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${PERIODS.map(p => `
+              <tr>
+                <td class="period-label">${p.label}</td>
+                ${DAYS.map(d => {
+                  const slot = slotMap[`${d}_${p.id}`];
+                  return slot
+                    ? `<td><div class="slot-card">
+                        <div class="slot-subject">${escHtml(slot.subjectName||'')}</div>
+                        <div class="slot-teacher">👨‍🏫 ${escHtml(slot.teacherName||'')}</div>
+                       </div></td>`
+                    : `<td><div class="slot-empty"></div></td>`;
+                }).join('')}
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    ${slots.length === 0 ? '<div class="empty-state" style="margin-top:16px"><p>لا توجد حصص لهذه الشعبة في الأسبوع المحدد. قم بتوليد الجدول أولاً.</p></div>' : ''}`;
+}
+
+// ── GENERATE SCHEDULE ─────────────────────────
+pages.generate = async () => {
+  const programs = await api('GET', '/programs');
+  const pc = document.getElementById('page-content');
+  pc.innerHTML = `
+    <div class="page-header">
+      <div><h2>توليد الجدول الدراسي</h2><p>توليد جدول تلقائي وفق 18 معياراً</p></div>
+    </div>
+    <div class="table-container" style="max-width:540px">
+      <div class="modal-body">
+        <div class="field"><label>البرنامج *</label>
+          <select id="gen-prog" class="field-input">
+            ${programs.map(p=>`<option value="${p.id}">${escHtml(p.name)}</option>`).join('')}
+          </select></div>
+        <div class="field"><label>رقم الأسبوع *</label>
+          <select id="gen-week" class="field-input">
+            ${[1,2,3,4,5,6,7,8,9,10].map(w=>`<option value="${w}">الأسبوع ${w}</option>`).join('')}
+          </select></div>
+        <div id="gen-result" style="margin-top:16px"></div>
+        <div style="margin-top:20px">
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="runGenerate()">
+            ⚙️ توليد الجدول الآن
+          </button>
+        </div>
+      </div>
+    </div>`;
+};
+
+async function runGenerate() {
+  const programId = document.getElementById('gen-prog').value;
+  const weekNumber = parseInt(document.getElementById('gen-week').value);
+  const res = document.getElementById('gen-result');
+  res.innerHTML = `<div class="loading-overlay"><div class="spinner"></div><span>جارٍ التوليد…</span></div>`;
+  try {
+    const data = await api('POST', '/generate-schedule', { programId, weekNumber });
+    res.innerHTML = `
+      <div style="background:rgba(46,160,67,.1);border:1px solid rgba(46,160,67,.3);border-radius:8px;padding:16px">
+        <div style="font-weight:700;color:var(--c-green2);margin-bottom:8px">✅ تم توليد الجدول بنجاح</div>
+        <div style="font-size:.85rem;display:flex;gap:20px;flex-wrap:wrap">
+          <span>📊 الشعب: <strong>${data.totalSections}</strong></span>
+          <span>📅 الحصص: <strong>${data.totalSlots}</strong></span>
+        </div>
+        ${data.violations?.length ? `<div style="margin-top:12px;color:var(--c-yellow2);font-size:.8rem">
+          ⚠️ تنبيهات (${data.violations.length}):<br>
+          ${data.violations.map(v=>`• ${escHtml(v)}`).join('<br>')}
+        </div>` : ''}
+        <button class="btn btn-ghost" style="margin-top:12px" onclick="navigate('schedule')">📅 عرض الجدول</button>
+      </div>`;
+    toast(`تم توليد ${data.totalSlots} حصة بنجاح`);
+  } catch (e) {
+    res.innerHTML = `<div style="color:var(--c-red2)">❌ ${e.message}</div>`;
+    toast(e.message, 'error');
+  }
+}
+
+// ── SCHEDULE RULES ────────────────────────────
+pages.rules = async () => {
+  const rules = await api('GET', '/schedule-rules');
+  renderTable('page-content', 'قواعد الجدولة الـ 18', `${rules.filter(r=>r.enabled).length} قاعدة مفعّلة`,
+    ['#','القاعدة','الوصف','الحالة','تبديل'],
+    rules.map(r => [
+      `<span style="font-family:var(--mono);color:var(--c-text2)">${r.id}</span>`,
+      `<strong>${escHtml(r.name)}</strong>`,
+      escHtml(r.description),
+      r.enabled ? '<span class="badge badge-green">مفعّلة</span>' : '<span class="badge badge-gray">معطّلة</span>',
+      `<button class="btn btn-ghost btn-icon" onclick="toggleRule(${r.id},${!r.enabled})" title="${r.enabled?'تعطيل':'تفعيل'}">
+        ${r.enabled ? '🟢' : '⭕'}
+      </button>`
+    ])
+  );
+};
+
+async function toggleRule(id, enabled) {
+  try {
+    await api('PUT', `/schedule-rules/${id}`, { enabled });
+    toast(enabled ? 'تم تفعيل القاعدة' : 'تم تعطيل القاعدة');
+    pages.rules();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ── CALENDAR ──────────────────────────────────
+pages.calendar = async () => {
+  const events = await api('GET', '/calendar-events');
+  const alerts = events.filter(e => e.activeAlerts?.length && e.colorClass !== 'expired');
+
+  const actions = document.getElementById('topbar-actions');
+  actions.innerHTML = `<button class="btn btn-success" onclick="openEventModal()">+ إضافة حدث</button>`;
+
+  const pc = document.getElementById('page-content');
+  const alertsHtml = alerts.length ? `
+    <div class="alerts-strip">
+      <span>🔔 تنبيهات نشطة:</span>
+      ${alerts.map(e=>`<span class="alert-pill">${escHtml(e.name)} — بعد ${e.daysLeft} يوم</span>`).join('')}
+    </div>` : '';
+
+  pc.innerHTML = alertsHtml + `<div id="calendar-table"></div>`;
+
+  const tableEl = document.getElementById('calendar-table');
+  tableEl.innerHTML = '';
+  renderTable('calendar-table', 'أحداث التقويم التدريبي', `${events.length} حدث`,
+    ['الحدث','التاريخ','النوع','الأيام المتبقية','إجراءات'],
+    events.map(e => {
+      const daysBadge = e.daysLeft < 0
+        ? `<span class="days-badge" style="background:rgba(248,81,73,.1);color:var(--c-red2)">انتهى</span>`
+        : e.daysLeft === 0
+        ? `<span class="days-badge" style="background:rgba(227,179,65,.15);color:var(--c-yellow2)">اليوم</span>`
+        : `<span class="days-badge" style="background:var(--c-surface2)">${e.daysLeft} يوم</span>`;
+      return [
+        `<strong>${escHtml(e.name)}</strong>`,
+        escHtml(e.date),
+        `<span class="badge badge-gray">${escHtml(e.type||'')}</span>`,
+        daysBadge,
+        `<div class="actions">
+          <button class="btn btn-ghost btn-icon" onclick='openEventModal(${JSON.stringify(e)})'>✏️</button>
+          <button class="btn btn-danger btn-icon" onclick="deleteItem('calendar-events','${e.id}','calendar')">🗑️</button>
+        </div>`
+      ];
+    }),
+    `event-row-${events[0]?.colorClass||''}`
+  );
+};
+
+function openEventModal(e = null) {
+  openModal(e ? 'تعديل حدث' : 'إضافة حدث', `
+    <div class="form-grid">
+      <div class="field full"><label>اسم الحدث *</label>
+        <input id="ev-name" class="field-input" value="${escHtml(e?.name||'')}"></div>
+      <div class="field"><label>التاريخ *</label>
+        <input id="ev-date" class="field-input" type="date" value="${e?.date||''}"></div>
+      <div class="field"><label>النوع</label>
+        <select id="ev-type" class="field-input">
+          ${['أكاديمي','اختبار','إجازة','فعالية','أخرى'].map(t=>`<option ${e?.type===t?'selected':''}>${t}</option>`).join('')}
+        </select></div>
+      <div class="field full"><label>أيام التنبيه (مفصولة بفواصل)</label>
+        <input id="ev-alerts" class="field-input" value="${(e?.alertDays||[14,7,1]).join(',')}" placeholder="14,7,1"></div>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+     <button class="btn btn-primary" onclick="saveEvent('${e?.id||''}')">💾 حفظ</button>`
+  );
+}
+
+async function saveEvent(id) {
+  const alertDays = document.getElementById('ev-alerts').value
+    .split(',').map(d => parseInt(d.trim())).filter(n => !isNaN(n));
+  const body = {
+    name: document.getElementById('ev-name').value.trim(),
+    date: document.getElementById('ev-date').value,
+    type: document.getElementById('ev-type').value,
+    alertDays
+  };
+  if (!body.name || !body.date) { toast('الاسم والتاريخ مطلوبان', 'error'); return; }
+  try {
+    if (id) { await api('PUT', `/calendar-events/${id}`, body); toast('تم تعديل الحدث'); }
+    else     { await api('POST', '/calendar-events', body); toast('تمت إضافة الحدث'); }
+    closeModal(); pages.calendar();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── CLASS SYSTEMS ─────────────────────────────
+pages.classsystems = async () => {
+  const systems = await api('GET', '/class-systems');
+  const actions = document.getElementById('topbar-actions');
+  actions.innerHTML = `<button class="btn btn-success" onclick="openSystemModal()">+ إضافة نظام</button>`;
+
+  renderTable('page-content', 'أنظمة الفصول الدراسية', `${systems.length} نظام`,
+    ['#','النظام','عدد الأسابيع','النوع','إجراءات'],
+    systems.map(s => [
+      `<span style="font-family:var(--mono)">${s.id}</span>`,
+      `<strong>${escHtml(s.name)}</strong>`,
+      `<span style="font-family:var(--mono)">${s.weeks} أسبوع</span>`,
+      s.deletable ? '<span class="badge badge-blue">مضاف</span>' : '<span class="badge badge-gray">افتراضي</span>',
+      s.deletable
+        ? `<button class="btn btn-danger btn-icon" onclick="deleteItem('class-systems','${s.id}','classsystems')">🗑️</button>`
+        : `<span style="color:var(--c-text3);font-size:.8rem">محمي</span>`
+    ])
+  );
+};
+
+function openSystemModal() {
+  openModal('إضافة نظام فصل', `
+    <div class="form-grid">
+      <div class="field full"><label>اسم النظام *</label>
+        <input id="sys-name" class="field-input" placeholder="مثال: فصل مكثف 12 أسبوع"></div>
+      <div class="field full"><label>عدد الأسابيع *</label>
+        <input id="sys-weeks" class="field-input" type="number" min="1" max="52" value="12"></div>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+     <button class="btn btn-primary" onclick="saveSystem()">💾 حفظ</button>`
+  );
+}
+
+async function saveSystem() {
+  const body = {
+    name: document.getElementById('sys-name').value.trim(),
+    weeks: parseInt(document.getElementById('sys-weeks').value)
+  };
+  if (!body.name || !body.weeks) { toast('الاسم وعدد الأسابيع مطلوبان', 'error'); return; }
+  try {
+    await api('POST', '/class-systems', body);
+    toast('تمت إضافة النظام');
+    closeModal(); pages.classsystems();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── REPORTS ───────────────────────────────────
+pages.reports = async () => {
+  const [overview, teacherLoad, bySemester] = await Promise.all([
+    api('GET', '/reports/overview'),
+    api('GET', '/reports/teacher-load'),
+    api('GET', '/reports/trainees-by-semester')
+  ]);
+
+  const pc = document.getElementById('page-content');
+  pc.innerHTML = `
+    <div class="page-header"><div><h2>التقارير والإحصاءات</h2></div></div>
+
+    <div class="stats-grid" style="margin-bottom:28px">
+      <div class="stat-card blue"><div class="stat-icon">📚</div>
+        <div class="stat-value">${overview.programs}</div><div class="stat-label">برامج</div></div>
+      <div class="stat-card purple"><div class="stat-icon">📖</div>
+        <div class="stat-value">${overview.subjects}</div><div class="stat-label">مواد</div></div>
+      <div class="stat-card green"><div class="stat-icon">👨‍🏫</div>
+        <div class="stat-value">${overview.availableTeachers}</div><div class="stat-label">معلمون متاحون</div></div>
+      <div class="stat-card teal"><div class="stat-icon">🏫</div>
+        <div class="stat-value">${overview.sections}</div><div class="stat-label">شعب</div></div>
+      <div class="stat-card yellow"><div class="stat-icon">🎓</div>
+        <div class="stat-value">${overview.trainees}</div><div class="stat-label">متدربون نشطون</div></div>
+      <div class="stat-card blue"><div class="stat-icon">📅</div>
+        <div class="stat-value">${overview.scheduledSlots}</div><div class="stat-label">حصص مجدولة</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap">
+      <div class="table-container">
+        <div class="table-header"><h3>نصاب المعلمين</h3></div>
+        <table class="tbl">
+          <thead><tr><th>المعلم</th><th>الحالة</th><th>الحصص</th><th>%</th></tr></thead>
+          <tbody>
+            ${teacherLoad.map((t,i) => {
+              const pct = t.percentage;
+              const cls = pct>=80?'high':pct>=50?'mid':'low';
+              return `<tr>
+                <td><strong>${escHtml(t.name)}</strong></td>
+                <td>${t.available && t.approvalStatus==='معتمد'?'<span class="badge badge-green">متاح</span>':'<span class="badge badge-red">غير متاح</span>'}</td>
+                <td style="font-family:var(--mono)">${t.currentLoad}/${t.maxLoad}</td>
+                <td>
+                  <span style="font-family:var(--mono);font-size:.78rem">${pct}%</span>
+                  <div class="progress-bar"><div class="progress-fill progress-${cls}" style="width:${pct}%"></div></div>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-container">
+        <div class="table-header"><h3>المتدربون حسب الفصل</h3></div>
+        <table class="tbl">
+          <thead><tr><th>الفصل/الجزء</th><th>عدد المتدربين</th></tr></thead>
+          <tbody>
+            ${Object.entries(bySemester).map(([key,val])=>`
+              <tr>
+                <td><span class="badge badge-blue">${escHtml(key)}</span></td>
+                <td style="font-family:var(--mono);font-weight:600">${val}</td>
+              </tr>`).join('') || '<tr><td colspan="2" class="empty-state"><p>لا توجد بيانات</p></td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+};
+
+// ── USERS ─────────────────────────────────────
+pages.users = async () => {
+  const users = await api('GET', '/users');
+  const actions = document.getElementById('topbar-actions');
+  actions.innerHTML = `<button class="btn btn-success" onclick="openUserModal()">+ إضافة مستخدم</button>`;
+
+  renderTable('page-content', 'إدارة المستخدمين', `${users.length} مستخدم`,
+    ['الاسم','البريد الإلكتروني','الدور','الحالة','إجراءات'],
+    users.map(u => [
+      `<strong>${escHtml(u.name)}</strong>`,
+      `<span style="font-family:var(--mono);font-size:.8rem">${escHtml(u.email)}</span>`,
+      `<span class="badge" style="background:${roleColor(u.role)}22;color:${roleColor(u.role)}">${roleName(u.role)}</span>`,
+      u.active ? '<span class="badge badge-green">نشط</span>' : '<span class="badge badge-red">معطّل</span>',
+      `<div class="actions">
+        <button class="btn btn-ghost btn-icon" onclick='openUserModal(${JSON.stringify(u)})'>✏️</button>
+        ${u.id !== currentUser.id
+          ? `<button class="btn btn-danger btn-icon" onclick="deleteItem('users','${u.id}','users')">🗑️</button>`
+          : `<span style="color:var(--c-text3);font-size:.75rem">حسابك</span>`}
+      </div>`
+    ])
+  );
+};
+
+function openUserModal(u = null) {
+  openModal(u ? 'تعديل مستخدم' : 'إضافة مستخدم', `
+    <div class="form-grid">
+      <div class="field"><label>الاسم *</label>
+        <input id="um-name" class="field-input" value="${escHtml(u?.name||'')}"></div>
+      <div class="field"><label>البريد الإلكتروني *</label>
+        <input id="um-email" class="field-input" type="email" value="${escHtml(u?.email||'')}"></div>
+      <div class="field"><label>الدور *</label>
+        <select id="um-role" class="field-input">
+          ${['admin','manager','dataentry','teacher','trainee'].map(r=>`<option value="${r}" ${u?.role===r?'selected':''}>${roleName(r)}</option>`).join('')}
+        </select></div>
+      <div class="field"><label>${u ? 'كلمة مرور جديدة (اتركه فارغاً للإبقاء)' : 'كلمة المرور *'}</label>
+        <input id="um-pass" class="field-input" type="password" placeholder="••••••"></div>
+      ${u ? `<div class="field"><label>الحالة</label>
+        <select id="um-active" class="field-input">
+          <option value="true" ${u.active?'selected':''}>نشط</option>
+          <option value="false" ${!u.active?'selected':''}>معطّل</option>
+        </select></div>` : ''}
+    </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+     <button class="btn btn-primary" onclick="saveUser('${u?.id||''}')">💾 حفظ</button>`
+  );
+}
+
+async function saveUser(id) {
+  const body = {
+    name: document.getElementById('um-name').value.trim(),
+    email: document.getElementById('um-email').value.trim(),
+    role: document.getElementById('um-role').value,
+    password: document.getElementById('um-pass').value || undefined,
+    active: id ? document.getElementById('um-active')?.value === 'true' : true
+  };
+  if (!body.name || !body.email) { toast('الاسم والبريد مطلوبان', 'error'); return; }
+  if (!id && !body.password)     { toast('كلمة المرور مطلوبة', 'error'); return; }
+  if (!body.password) delete body.password;
+  try {
+    if (id) { await api('PUT', `/users/${id}`, body); toast('تم تعديل المستخدم'); }
+    else     { await api('POST', '/users', body); toast('تمت إضافة المستخدم'); }
+    closeModal(); pages.users();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function renderTable(containerId, title, subtitle, headers, rows) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = `
+    <div class="table-container">
+      <div class="table-header">
+        <div>
+          <h3>${title}</h3>
+          <span style="font-size:.8rem;color:var(--c-text2)">${subtitle}</span>
+        </div>
+      </div>
+      <table class="tbl">
+        <thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${rows.length === 0
+            ? `<tr><td colspan="${headers.length}"><div class="empty-state"><div class="empty-icon">📭</div><p>لا توجد بيانات</p></div></td></tr>`
+            : rows.map(row=>`<tr>${row.map(cell=>`<td>${cell}</td>`).join('')}</tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function deleteItem(endpoint, id, pageKey) {
+  if (!confirm('هل أنت متأكد من الحذف؟')) return;
+  try {
+    await api('DELETE', `/${endpoint}/${id}`);
+    toast('تم الحذف بنجاح');
+    pages[pageKey]?.();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function downloadTemplate(type) {
+  window.open(`${API}/templates/${type}?token=${token()}`, '_blank');
+  // Pass token via header not supported in window.open, use simple approach:
+  fetch(`${API}/templates/${type}`, { headers: { Authorization: `Bearer ${token()}` } })
+    .then(r => r.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `template_${type}.xlsx`;
+      a.click(); URL.revokeObjectURL(url);
+    });
+}
+
+function openUploadModal(type) {
+  const labels = { subjects:'المواد', teachers:'المعلمين', trainees:'المتدربين' };
+  openModal(`رفع ملف Excel — ${labels[type]||type}`, `
+    <div class="field">
+      <label>اختر ملف Excel (.xlsx)</label>
+      <input id="upload-file" class="field-input" type="file" accept=".xlsx,.xls" style="padding:6px">
+    </div>
+    ${type==='trainees' ? `<div class="field" style="display:flex;align-items:center;gap:8px">
+      <input id="upload-notify" type="checkbox">
+      <label style="margin:0">إرسال إشعارات بريدية للمتدربين</label>
+    </div>` : ''}
+    <div id="upload-result"></div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+     <button class="btn btn-primary" onclick="doUpload('${type}')">📤 رفع الملف</button>`
+  );
+}
+
+async function doUpload(type) {
+  const file = document.getElementById('upload-file').files[0];
+  if (!file) { toast('يرجى اختيار ملف', 'error'); return; }
+  const fd = new FormData();
+  fd.append('file', file);
+  if (type === 'trainees') fd.append('notify', document.getElementById('upload-notify')?.checked);
+  try {
+    const result = await apiUpload(`/${type}/upload`, fd);
+    const res = document.getElementById('upload-result');
+    res.innerHTML = `
+      <div style="background:rgba(46,160,67,.1);border:1px solid rgba(46,160,67,.3);border-radius:8px;padding:12px;margin-top:12px;font-size:.85rem">
+        <strong>✅ نتيجة الرفع:</strong><br>
+        الإجمالي: ${result.total} | تمت الإضافة: ${result.added} | المكرر: ${result.skipped}
+        ${result.sectionsCreated ? ` | شعب جديدة: ${result.sectionsCreated}` : ''}
+      </div>`;
+    toast(`تمت إضافة ${result.added} سجل`);
+    setTimeout(() => { closeModal(); navigate(type); }, 1500);
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════
+// STARTUP — check existing session
+// ═══════════════════════════════════════
+(async () => {
+  const t = token();
+  if (t) {
+    try {
+      const res = await fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${t}` } });
+      if (res.ok) {
+        currentUser = await res.json();
+        showApp();
+        return;
+      }
+    } catch {}
+    localStorage.removeItem('tms_token');
+  }
+  document.getElementById('login-page').style.display = 'flex';
+})();
+</script>
+</body>
+</html>
